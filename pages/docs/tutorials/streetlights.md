@@ -23,7 +23,7 @@ You'll use Node.js to code APIs and Mosquitto as the message broker. Selected te
 Let's start by creating an AsyncAPI file to describe your API. It will help you generate the code and the documentation later.
 
 <CodeBlock>
-{`asyncapi: '2.0.0'
+{`asyncapi: '2.1.0'
 info:
   title: Streetlights API
   version: '1.0.0'
@@ -43,6 +43,7 @@ channels:
       summary: Inform about environmental lighting conditions for a particular streetlight.
       operationId: onLightMeasured
       message:
+        name: LightMeasured
         payload:
           type: object
           properties:
@@ -63,7 +64,7 @@ channels:
 Let's break it down into pieces:
 
 <CodeBlock>
-{`asyncapi: '2.0.0'
+{`asyncapi: '2.1.0'
 info:
   title: Streetlights API
   version: '1.0.0'
@@ -75,7 +76,7 @@ info:
     url: 'https://www.apache.org/licenses/LICENSE-2.0'`}
 </CodeBlock>
 
-- The `asyncapi` field indicates you use AsyncAPI version 2.0.0.
+- The `asyncapi` field indicates you use AsyncAPI version 2.1.0.
 - Inside the `info` field you find information about the API, like its name, version, description, and its license.
 
 We're now going for the `channels` section. It is used to describe the event names your API will be publishing and/or subscribing to.
@@ -118,7 +119,7 @@ Cool! So you're done with your AsyncAPI file! Let's get into generating code.
 
 To generate your code you'll use the [AsyncAPI Generator](https://github.com/asyncapi/generator) Node.js template.
 
-### 1. Install the generator to use is at a command-line tool
+### 1. Install the generator to use it as a command-line tool
 <CodeBlock language="bash">
 {`npm install -g @asyncapi/generator`}
 </CodeBlock>
@@ -131,7 +132,7 @@ To generate your code you'll use the [AsyncAPI Generator](https://github.com/asy
 ### 3. Create a file with the AsyncAPI machine-readable description you defined before. On Windows use `type` instead of `cat`:
 <CodeBlock language="yaml">
 {`cat <<EOT >> asyncapi.yaml
-asyncapi: '2.0.0'
+asyncapi: '2.1.0'
 info:
   title: Streetlights API
   version: '1.0.0'
@@ -151,6 +152,7 @@ channels:
       summary: Inform about environmental lighting conditions for a particular streetlight.
       operationId: onLightMeasured
       message:
+        name: LightMeasured
         payload:
           type: object
           properties:
@@ -196,12 +198,17 @@ EOT`}
 {`npm install mqtt -g`}
 </CodeBlock>
 
-### 4. Send message to your application:
+### 4. Send correct message to your application:
 <CodeBlock language="bash">
 {`mqtt pub -t 'light/measured' -h 'test.mosquitto.org' -m '{"id": 1, "lumens": 3, "sentAt": "2017-06-07T12:34:32.000Z"}'`}
 </CodeBlock>
 
-### 5. Go back to previous terminal and notice that your application logs the message you just sent.
+### 5. Send incorrect message to your application:
+<CodeBlock language="bash">
+{`mqtt pub -t 'light/measured' -h 'test.mosquitto.org' -m '{"id": 1, "lumens": "3", "sentAt": "2017-06-07T12:34:32.000Z"}'`}
+</CodeBlock>
+
+### 6. Go back to the previous terminal and notice that your application logs the message you just sent and errors related to invalid message.
 
 # Conclusions
 
